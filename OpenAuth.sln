@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAuth", "OpenAuth\OpenAuth.csproj", "{A32657E6-A6E9-41AD-92B4-0C499F7A607A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAuth.Tests", "OpenAuth.Tests\OpenAuth.Tests.csproj", "{485B73E7-FD0B-4BC2-9839-7BE2CB21B13C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{4858FECC-221D-45C3-981C-06302BC7A158}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A32657E6-A6E9-41AD-92B4-0C499F7A607A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A32657E6-A6E9-41AD-92B4-0C499F7A607A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A32657E6-A6E9-41AD-92B4-0C499F7A607A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A32657E6-A6E9-41AD-92B4-0C499F7A607A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{485B73E7-FD0B-4BC2-9839-7BE2CB21B13C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{485B73E7-FD0B-4BC2-9839-7BE2CB21B13C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{485B73E7-FD0B-4BC2-9839-7BE2CB21B13C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{485B73E7-FD0B-4BC2-9839-7BE2CB21B13C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
