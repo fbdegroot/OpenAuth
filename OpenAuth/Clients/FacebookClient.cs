@@ -27,6 +27,16 @@ namespace OpenAuth.Consumers
 			Publish = 4
 		}
 
+		public enum Display
+		{
+			[Value("page")]
+			Page,
+			[Value("popup")]
+			Popup,
+			[Value("touch")]
+			Touch
+		}
+
 		private static Uri AuthorizeEndpoint = new Uri("https://www.facebook.com/dialog/oauth");
 		private static Uri AccessTokenEndpoint = new Uri("https://graph.facebook.com/oauth/access_token");
 		private static Uri UserInfoEndpoint = new Uri("https://graph.facebook.com/me");
@@ -36,20 +46,25 @@ namespace OpenAuth.Consumers
 
 		private static JsonSerializer jsonSerializer;
 
-		public static string ClientID = ConfigurationManager.AppSettings["FacebookClientID"];
-		public static string ClientSecret = ConfigurationManager.AppSettings["FacebookClientSecret"];
+		private static string clientId = ConfigurationManager.AppSettings["FacebookClientID"];
+		private static string clientSecret = ConfigurationManager.AppSettings["FacebookClientSecret"];
+		private static string scopeDelimiter = ",";
 
 		static FacebookClient()
 		{
 			jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings { });
 		}
 
-		public static string Auth(string callbackUrl, Scope scope = Scope.None)
+		public static string Auth(string callbackUrl, string state, Scope scope = Scope.None, Display display = Display.Page)
 		{
 			var parameters = new List<Parameter> {
-				new Parameter { Name = OAuth2Parameter.ConsumerID.Value(), Value = ClientID },
-				new Parameter { Name = OAuth2Parameter.CallbackUrl.Value(), Value = callbackUrl }
+				new Parameter { Name = OAuth2Parameter.ConsumerID.Value(), Value = clientId },
+				new Parameter { Name = OAuth2Parameter.CallbackUrl.Value(), Value = callbackUrl },
+				new Parameter { Name = OAuth2Parameter.State.Value(), Value = state }
 			};
+
+			if (display != Display.Page)
+				parameters.Add(new Parameter { Name = OAuth2Parameter.Display.Value(), Value = display.Value() });
 
 			if (scope != Scope.None) {
 				var permissionNames = new List<string>();
@@ -61,7 +76,7 @@ namespace OpenAuth.Consumers
 					permissionNames.Add(Scope.Publish.Value());
 
 				if (permissionNames.Count > 0)
-					parameters.Insert(0, new Parameter { Name = OAuth2Parameter.Scope.Value(), Value = string.Join(",", permissionNames) });
+					parameters.Insert(0, new Parameter { Name = OAuth2Parameter.Scope.Value(), Value = string.Join(scopeDelimiter, permissionNames) });
 			}
 
 			return Utils.CreateUri(AuthorizeEndpoint, parameters).AbsoluteUri;
@@ -76,12 +91,13 @@ namespace OpenAuth.Consumers
 				throw new OpenAuthException { Error = OpenAuthErrorType.MissingKeys };
 
 			string code = HttpContext.Current.Request.QueryString[OAuth2Parameter.Code.Value()];
+			string guid = HttpContext.Current.Request.QueryString[OAuth2Parameter.Guid.Value()];
 
 			string response = Request(HttpMethod.Get, AccessTokenEndpoint, new List<Parameter> {
-				 new Parameter { Name = OAuth2Parameter.ConsumerID.Value(), Value = ClientID },
-				 new Parameter { Name = OAuth2Parameter.ConsumerSecret.Value(), Value = ClientSecret },
+				 new Parameter { Name = OAuth2Parameter.ConsumerID.Value(), Value = clientId },
+				 new Parameter { Name = OAuth2Parameter.ConsumerSecret.Value(), Value = clientSecret },
 				 new Parameter { Name = OAuth2Parameter.Code.Value(), Value = code },
-				 new Parameter { Name = OAuth2Parameter.CallbackUrl.Value(), Value = OAuth2.StripQuery(HttpContext.Current.Request.Url, OAuth2Parameter.Code.Value()).AbsoluteUri }
+				 new Parameter { Name = OAuth2Parameter.CallbackUrl.Value(), Value = OpenAuthConfiguration.CallbackUrl }
 			});
 
 			NameValueCollection data = HttpUtility.ParseQueryString(response);
@@ -105,7 +121,8 @@ namespace OpenAuth.Consumers
 				DisplayName = data["name"].Value<string>(),
 				Email = data["email"] != null ? data["email"].Value<string>() : null,
 				Link = data["link"].Value<string>(),
-				Gender = data["gender"] != null ? data["gender"].Value<string>() == "male" ? OpenAuthGender.Male : OpenAuthGender.Female : (OpenAuthGender?)null
+				Gender = data["gender"] != null ? data["gender"].Value<string>() == "male" ? OpenAuthGender.Male : OpenAuthGender.Female : (OpenAuthGender?)null,
+				PictureUrl = string.Format("http://graph.facebook.com/{0}/picture?type=large", data["id"].Value<string>())
 			};
 
 			if (data["hometown"] != null)

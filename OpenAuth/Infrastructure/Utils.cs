@@ -81,7 +81,7 @@ namespace OpenAuth.Infrastructure
 				}
 
 				if (parameters.Any(p => p.Type == ParameterType.Query))
-					uriBuilder.Query = string.Join("&", parameters.Where(p => p.Type == ParameterType.Query).Select(q => q.Name + "=" + UrlEncode(q.Value)));
+					uriBuilder.Query = string.Join("&", parameters.Where(p => p.Type == ParameterType.Query).Select(q => q.Name + "=" + (q.Encode ? UrlEncode(q.Value) : q.Value)));
 			}
 
 			return uriBuilder.Uri;
@@ -113,7 +113,7 @@ namespace OpenAuth.Infrastructure
 			// post parameters
 			if (parameters != null && parameters.Any(p => p.Type == ParameterType.Post))
 			{
-				string parameterString = string.Join("&", parameters.Where(p => p.Type == ParameterType.Post).Select(p => p.Name + "=" + UrlEncode(p.Value)));
+				string parameterString = string.Join("&", parameters.Where(p => p.Type == ParameterType.Post).Select(p => p.Name + "=" + (p.Encode ? UrlEncode(p.Value) : p.Value)));
 				byte[] bytes = System.Text.Encoding.ASCII.GetBytes(parameterString);
 				using (var requestStream = request.GetRequestStream())
 				{

@@ -10,16 +10,19 @@ namespace OpenAuth.Infrastructure
 		public string Name { get; set; }
 		public string Value { get; set; }
 		public ParameterType Type { get; set; }
+		public bool Encode { get; set; }
 
 		public Parameter()
 		{
 			Type = ParameterType.Query;
+			Encode = true;
 		}
 		public Parameter(string name, string value)
 		{
 			Name = name;
 			Value = value;
 			Type = ParameterType.Query;
+			Encode = true;
 		}
 	}
 	internal class LexicographicComparer : IComparer<Parameter>

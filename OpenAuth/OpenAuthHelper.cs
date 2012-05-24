@@ -19,31 +19,32 @@ namespace OpenAuth
 		}
 		public static RedirectResult Auth(OpenAuthProvider provider, int scope, Action<OpenAuthUser, OpenAuthAccessToken, IPrincipal, HttpSessionState, HttpResponse> callback)
 		{
-			return new RedirectResult(Auth(provider, scope, false, callback));
+			return new RedirectResult(Auth(provider, scope, callback, null));
 		}
-		public static RedirectResult AuthClosePopup(OpenAuthProvider provider, Action<OpenAuthUser, OpenAuthAccessToken, IPrincipal, HttpSessionState, HttpResponse> callback)
+		public static RedirectResult AuthClosePopup(OpenAuthProvider provider, Func<OpenAuthUser, OpenAuthAccessToken, IPrincipal, HttpSessionState, HttpResponse, object> callback)
 		{
 			return AuthClosePopup(provider, 0, callback);
 		}
-		public static RedirectResult AuthClosePopup(OpenAuthProvider provider, int scope, Action<OpenAuthUser, OpenAuthAccessToken, IPrincipal, HttpSessionState, HttpResponse> callback)
+		public static RedirectResult AuthClosePopup(OpenAuthProvider provider, int scope, Func<OpenAuthUser, OpenAuthAccessToken, IPrincipal, HttpSessionState, HttpResponse, object> callback)
 		{
-			return new RedirectResult(Auth(provider, scope, true, callback));
+			return new RedirectResult(Auth(provider, scope, null, callback));
 		}
-		private static string Auth(OpenAuthProvider provider, int scope, bool closePopup, Action<OpenAuthUser, OpenAuthAccessToken, IPrincipal, HttpSessionState, HttpResponse> callback)
+		private static string Auth(OpenAuthProvider provider, int scope, Action<OpenAuthUser, OpenAuthAccessToken, IPrincipal, HttpSessionState, HttpResponse> callback, Func<OpenAuthUser, OpenAuthAccessToken, IPrincipal, HttpSessionState, HttpResponse, object> closePopupCallback)
 		{
-			string guid = Guid.NewGuid().ToString();
-			string callbackUrl = OpenAuthConfiguration.CallbackProtocol + Uri.SchemeDelimiter + OpenAuthConfiguration.CallbackDomain + "/" + OpenAuthConfiguration.CallbackPath + "?guid=" + guid;
-			OpenAuthSessionRepository.Sessions[guid] = new OpenAuthSession {
-				ClosePopup = closePopup,
+			string state = Guid.NewGuid().ToString();
+			OpenAuthSessionRepository.Sessions[state] = new OpenAuthSession {
 				Callback = callback,
+				ClosePopupCallback = closePopupCallback,
 				Provider = provider
 			};
 
 			switch (provider) {
 				case OpenAuthProvider.Facebook:
-					return FacebookClient.Auth(callbackUrl, (FacebookClient.Scope)scope);
+					return FacebookClient.Auth(OpenAuthConfiguration.CallbackUrl, state, (FacebookClient.Scope)scope, closePopupCallback != null ? FacebookClient.Display.Popup : FacebookClient.Display.Page);
+				case OpenAuthProvider.Google:
+					return GoogleClient.Auth(OpenAuthConfiguration.CallbackUrl, state, (GoogleClient.Scope)scope);
 				case OpenAuthProvider.Twitter:
-					return TwitterClient.Auth(callbackUrl);
+					return TwitterClient.Auth(OpenAuthConfiguration.CallbackUrl, state);
 				default:
 					throw new NotImplementedException(provider.ToString());
 			}
@@ -54,6 +55,8 @@ namespace OpenAuth
 			switch (provider) {
 				case OpenAuthProvider.Facebook:
 					return FacebookClient.GetFriends(token.Token);
+				case OpenAuthProvider.Google:
+					return GoogleClient.GetFriends(token.Token);
 				case OpenAuthProvider.Twitter:
 					return TwitterClient.GetFriends(token.Token, token.TokenSecret);
 				default:

@@ -7,9 +7,16 @@ namespace OpenAuth
 {
 	public static class OpenAuthConfiguration
 	{
-		public static string CallbackProtocol { get; set; }
-		public static string CallbackDomain { get; set; }
-		public static string CallbackPath { get; set; }
+		private static string CallbackProtocol { get; set; }
+		private static string CallbackDomain { get; set; }
+		private static string CallbackPath { get; set; }
+		public static string CallbackUrl
+		{
+			get
+			{
+				return CallbackProtocol + Uri.SchemeDelimiter + CallbackDomain + "/" + CallbackPath;
+			}
+		}
 
 		static OpenAuthConfiguration()
 		{

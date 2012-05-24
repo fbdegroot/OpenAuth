@@ -30,8 +30,8 @@ namespace OpenAuth.Consumers
 		private static ConcurrentDictionary<string, string> requestTokens;
 		private static JsonSerializer jsonSerializer;
 
-		public static string ClientID = ConfigurationManager.AppSettings["TwitterClientID"];
-		public static string ClientSecret = ConfigurationManager.AppSettings["TwitterClientSecret"];
+		public static string clientId = ConfigurationManager.AppSettings["TwitterClientID"];
+		public static string clientSecret = ConfigurationManager.AppSettings["TwitterClientSecret"];
 
 		static TwitterClient()
 		{
@@ -39,9 +39,10 @@ namespace OpenAuth.Consumers
 			jsonSerializer = JsonSerializer.Create(new JsonSerializerSettings { });
 		}
 
-		public static string Auth(string callbackUrl)
+		public static string Auth(string callbackUrl, string state)
 		{
-			var requestToken = OAuth.GetRequestToken(RequestTokenEndpoint, ClientID, ClientSecret, callbackUrl);
+			callbackUrl += "?state=" + state;
+			var requestToken = OAuth.GetRequestToken(RequestTokenEndpoint, clientId, clientSecret, callbackUrl);
 
 			requestTokens[requestToken.Token] = requestToken.TokenSecret;
 
@@ -60,7 +61,7 @@ namespace OpenAuth.Consumers
 			string token = HttpContext.Current.Request.QueryString[OAuthParameter.Token.Value()];
 			string verifier = HttpContext.Current.Request.QueryString[OAuthParameter.Verifier.Value()];
 
-			return OAuth.GetAccessToken(AccessTokenEndpoint, ClientID, ClientSecret, token, requestTokens[token], verifier);
+			return OAuth.GetAccessToken(AccessTokenEndpoint, clientId, clientSecret, token, requestTokens[token], verifier);
 		}
 
 		public static OpenAuthUser GetUserInfo(string accessToken, string accessTokenSecret)
@@ -70,18 +71,19 @@ namespace OpenAuth.Consumers
 				new Parameter { Name = OAuthParameter.SkipStatus.Value(), Value = true.ToString().ToLower() }
 			};
 
-			string response = Request(HttpMethod.Get, UserInfoEndpoint, parameters, ClientID, ClientSecret, accessToken, accessTokenSecret);
+			string response = Request(HttpMethod.Get, UserInfoEndpoint, parameters, clientId, clientSecret, accessToken, accessTokenSecret);
 
 			JObject data = JObject.Parse(response);
 			return new OpenAuthUser {
 				ID = data["id"].Value<string>(),
 				FullName = data["name"].Value<string>(),
-				DisplayName = data["screen_name"].Value<string>()
+				DisplayName = data["screen_name"].Value<string>(),
+				PictureUrl = string.Format("https://api.twitter.com/1/users/profile_image?size=bigger&screen_name={0}", data["screen_name"].Value<string>())
 			};
 		}
 		public static IEnumerable<OpenAuthFriend> GetFriends(string accessToken, string accessTokenSecret)
 		{
-			string response = Request(HttpMethod.Get, FriendsEndpoint, null, ClientID, ClientSecret, accessToken, accessTokenSecret);
+			string response = Request(HttpMethod.Get, FriendsEndpoint, null, clientId, clientSecret, accessToken, accessTokenSecret);
 
 			JObject data = JObject.Parse(response);
 			return (data["ids"] as JArray).Select(id => new OpenAuthFriend {
@@ -90,7 +92,7 @@ namespace OpenAuth.Consumers
 		}
 		public static IEnumerable<OpenAuthFriend> GetFollowers(string accessToken, string accessTokenSecret)
 		{
-			string response = Request(HttpMethod.Get, FollowersEndpoint, null, ClientID, ClientSecret, accessToken, accessTokenSecret);
+			string response = Request(HttpMethod.Get, FollowersEndpoint, null, clientId, clientSecret, accessToken, accessTokenSecret);
 
 			JObject data = JObject.Parse(response);
 			return (data["ids"] as JArray).Select(id => new OpenAuthFriend {
@@ -104,7 +106,7 @@ namespace OpenAuth.Consumers
 				new Parameter { Name = OAuthParameter.Status.Value(), Value = message, Type = ParameterType.Post }
 			};
 
-			string response = Request(HttpMethod.Post, UpdateEndpoint, parameters, ClientID, ClientSecret, accessToken, accessTokenSecret);
+			string response = Request(HttpMethod.Post, UpdateEndpoint, parameters, clientId, clientSecret, accessToken, accessTokenSecret);
 		}
 
 		public static string Request(HttpMethod httpMethod, Uri uri, List<Parameter> parameters, string consumerKey, string consumerSecret, string token, string tokenSecret, SignatureMethod signatureMethod = SignatureMethod.HMACSHA1)

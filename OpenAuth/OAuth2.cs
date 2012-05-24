@@ -22,7 +22,13 @@ namespace OpenAuth
 		[Value("scope")]
 		Scope,
 		[Value("message")]
-		Message
+		Message,
+		[Value("display")]
+		Display,
+		[Value("guid")]
+		Guid,
+		[Value("state")]
+		State
 	}
 
 	internal static class OAuth2

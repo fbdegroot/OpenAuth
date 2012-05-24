@@ -12,8 +12,8 @@ namespace OpenAuth
 {
 	public class OpenAuthSession
 	{
-		public bool ClosePopup { get; set; }
 		public OpenAuthProvider Provider { get; set; }
 		public Action<OpenAuthUser, OpenAuthAccessToken, IPrincipal, HttpSessionState, HttpResponse> Callback { get; set; }
+		public Func<OpenAuthUser, OpenAuthAccessToken, IPrincipal, HttpSessionState, HttpResponse, object> ClosePopupCallback { get; set; }
 	}
 }
