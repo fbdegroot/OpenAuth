@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Web;
-using System.Web.Mvc;
 using System.Web.SessionState;
-using OpenAuth.Consumers;
-using OpenAuth.Models;
 using Newtonsoft.Json;
+using OpenAuth.Consumers;
 using OpenAuth.Infrastructure;
+using OpenAuth.Models;
 
 namespace OpenAuth
 {
@@ -43,9 +39,17 @@ namespace OpenAuth
 						accessToken = GoogleClient.ProcessCallback();
 						userInfo = GoogleClient.GetUserInfo(accessToken.Token);
 						break;
+					case OpenAuthProvider.Live:
+						accessToken = LiveClient.ProcessCallback();
+						userInfo = LiveClient.GetUserInfo(accessToken.Token);
+						break;
 					case OpenAuthProvider.Twitter:
 						accessToken = TwitterClient.ProcessCallback();
 						userInfo = TwitterClient.GetUserInfo(accessToken.Token, accessToken.TokenSecret);
+						break;
+					case OpenAuthProvider.LinkedIn:
+						accessToken = LinkedInClient.ProcessCallback();
+						userInfo = LinkedInClient.GetUserInfo(accessToken.Token, accessToken.TokenSecret);
 						break;
 					default:
 						throw new NotImplementedException(session.Provider.ToString());

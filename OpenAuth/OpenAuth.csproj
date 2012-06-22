@@ -84,6 +84,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Clients\LinkedInClient.cs" />
+    <Compile Include="Clients\LiveClient.cs" />
     <Compile Include="Clients\GoogleClient.cs" />
     <Compile Include="Clients\FacebookClient.cs" />
     <Compile Include="Clients\TwitterClient.cs" />

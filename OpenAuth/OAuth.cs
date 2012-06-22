@@ -56,7 +56,9 @@ namespace OpenAuth
 		[Value("skip_status")]
 		SkipStatus,
 		[Value("status")]
-		Status
+		Status,
+		[Value("format")]
+		Format
 	}
 
 	internal static class OAuth
@@ -125,12 +127,12 @@ namespace OpenAuth
 				normalizedUrl += ":" + uri.Port;
 			normalizedUrl += uri.AbsolutePath;
 
-			var normalizedRequestParameters = string.Join("&", parameters.Select(p => p.Name + "=" + Uri.EscapeDataString(p.Value)));
+			var normalizedRequestParameters = string.Join("&", parameters.Select(p => p.Name + "=" + Utils.UrlEncode(p.Value)));
 
 			StringBuilder signatureBaseSb = new StringBuilder();
 			signatureBaseSb.AppendFormat("{0}&", httpMethod.Value());
-			signatureBaseSb.AppendFormat("{0}&", Uri.EscapeDataString(normalizedUrl));
-			signatureBaseSb.AppendFormat("{0}", Uri.EscapeDataString(normalizedRequestParameters));
+			signatureBaseSb.AppendFormat("{0}&", Utils.UrlEncode(normalizedUrl));
+			signatureBaseSb.AppendFormat("{0}", Utils.UrlEncode(normalizedRequestParameters));
 			return signatureBaseSb.ToString();
 		}
 		private static string GenerateSignature(string consumerSecret, SignatureMethod signatureMethod, string signatureBaseString, string tokenSecret = null)

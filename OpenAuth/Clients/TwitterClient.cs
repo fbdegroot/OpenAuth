@@ -78,7 +78,7 @@ namespace OpenAuth.Consumers
 				ID = data["id"].Value<string>(),
 				FullName = data["name"].Value<string>(),
 				DisplayName = data["screen_name"].Value<string>(),
-				PictureUrl = string.Format("https://api.twitter.com/1/users/profile_image?size=bigger&screen_name={0}", data["screen_name"].Value<string>())
+				PictureUrl = string.Format("https://api.twitter.com/1/users/profile_image?size=original&screen_name={0}", data["screen_name"].Value<string>())
 			};
 		}
 		public static IEnumerable<OpenAuthFriend> GetFriends(string accessToken, string accessTokenSecret)

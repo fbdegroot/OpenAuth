@@ -28,7 +28,11 @@ namespace OpenAuth
 		[Value("guid")]
 		Guid,
 		[Value("state")]
-		State
+		State,
+		[Value("response_type")]
+		ResponseType,
+		[Value("grant_type")]
+		GrantType
 	}
 
 	internal static class OAuth2
