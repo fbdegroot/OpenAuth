@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Collections.Specialized;
 using System.Linq;
-using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using OpenAuth.Infrastructure;
 using System.Web;
-using System.Collections.Specialized;
+using OpenAuth.Infrastructure;
 
 namespace OpenAuth
 {

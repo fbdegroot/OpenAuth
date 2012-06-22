@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.Configuration;
 using System.Linq;
-using System.Text;
 using System.Web;
-using System.Web.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenAuth.Infrastructure;
 using OpenAuth.Models;
-using System.Net;
-using System.Configuration;
 
 namespace OpenAuth.Consumers
 {

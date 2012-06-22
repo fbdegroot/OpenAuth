@@ -1,16 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.Configuration;
 using System.Linq;
-using System.Text;
 using System.Web;
-using System.Web.Mvc;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OpenAuth.Infrastructure;
 using OpenAuth.Models;
-using System.Net;
-using System.Configuration;
 
 namespace OpenAuth.Consumers
 {
@@ -31,7 +27,7 @@ namespace OpenAuth.Consumers
 		private static Uri AccessTokenEndpoint = new Uri("https://oauth.live.com/token");
 		private static Uri UserInfoEndpoint = new Uri("https://apis.live.net/v5.0/me");
 
-		private static Uri ContactsEndpoint = new Uri("");		
+		// private static Uri ContactsEndpoint = new Uri("");
 
 		private static JsonSerializer jsonSerializer;
 

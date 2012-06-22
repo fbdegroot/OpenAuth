@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using System.IO;
 using System.Web.Configuration;
 
 namespace OpenAuth
